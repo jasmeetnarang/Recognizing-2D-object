@@ -90,6 +90,7 @@ void p1(Image *an_image,int T);
 
 void p2(Image *an_image);
 
+void Area(Image *an_image);
 void p3(Image *an_image);
 
 

@@ -334,10 +334,43 @@ namespace ComputerVisionProjects {
     }
 
     void p3(Image *an_image){
-        std::vector<std::set<int>> equivalenceMap;
-        int label;
-        int numberofObjects = getEquivClass(equivalenceMap,label);
-        cout<<numberofObjects;
+        const int num_rows = an_image->num_rows();
+        const int num_columns = an_image->num_columns();
+
+        int numberofObjects = 0;
+        numberofObjects = an_image->num_gray_levels();
+        //cout<<numberofObjects;
+        for(int k=1;k<=numberofObjects;k++){
+            float Area = 0.0;
+            float iVal = 0.0, jVal = 0.0;
+            int momenta =0,momentb=0, momentc =0;
+            //cout<<"label:"<<k<<" ";
+            for (int i = 0; i < num_rows; ++i) {
+                for (int j = 0;j < num_columns; ++j) {
+                    int pixelVal = an_image->GetPixel(i, j);
+                    //if(pixelVal == 1) cout<<pixelVal;
+                    if(pixelVal == k) {
+                        Area = pixelVal + Area;
+                        iVal = iVal+(i*pixelVal);
+                        jVal = jVal+(j*pixelVal);
+                        momenta = momenta +(i*i*pixelVal);
+                        momentb = momentb +(i*j*pixelVal);
+                        momentc = momentc + (j*j*pixelVal);
+
+                    }
+
+                }
+            }
+            cout<<"Area:"<<Area<<" ";
+            float fract = 1/Area;
+            cout<<"fract:"<<fract<<" ";
+            cout<<"position of x:"<<fract*iVal<<" ";
+            cout<<"position of y:"<<fract*jVal<<" ";
+            cout<<"second moment a:"<< momenta<<" ";
+            cout<<"second moment b:"<< momentb<<" ";
+            cout<<"second moment c:"<< momentc<<" "<<endl;
+            //return Area;
+        }
     }
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes

@@ -29,7 +29,7 @@ main(int argc, char **argv){
     // 200.
     //DrawLine(0, 0, 100, 240, 200,
 //	   &an_image);
-    p2(&an_image);
+    //p2(&an_image);
     p3(&an_image);
     //printImageInfo(&an_image);
 
