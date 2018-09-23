@@ -8,6 +8,9 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <map>
+#include <set>
+#include <vector>
 
 using namespace std;
 
@@ -129,53 +132,53 @@ namespace ComputerVisionProjects {
 //Coverts the gray scale image to a binay image
 //given a threshold value
 
-    void printImageInfo(Image *an_image){
-        const int num_rows = an_image->num_rows();
-        const int num_columns = an_image->num_columns();
-        const int num_gray_levels =an_image->num_gray_levels();
-
-        if(an_image == nullptr) abort();
-
-        int binsSize = 1;
-
-        if(num_gray_levels > 0){
-            binsSize =num_gray_levels+1;
-        }
-
-
-        int bins[binsSize] ={0};
-        int min =binsSize;
-        int max = -1;
-
-        for (int i = 0; i < num_rows; ++i) {
-            for (int j = 0;j < num_columns; ++j) {
-                int pixelVal = an_image->GetPixel(i,j);
-                cout<<pixelVal<<" ";
-
-                 if(pixelVal<min) {
-                     min = pixelVal;
-                 }
-                 if(pixelVal>max) {
-                     max = pixelVal;
-                 }
-
-                bins[pixelVal]++;
-
-            }
-            cout<<endl;
-        }
-
-        cout<<"Bins : "<<endl;
-
-        for(int i=0;i<binsSize;i++){
-            cout<<i<<" - "<<bins[i]<<endl;
-        }
-
-
-        cout<<"Min : "<<min<<endl;
-        cout<<"Max : "<<max<<endl;
-
-    }
+//    void printImageInfo(Image *an_image){
+//        const int num_rows = an_image->num_rows();
+//        const int num_columns = an_image->num_columns();
+//        const int num_gray_levels =an_image->num_gray_levels();
+//
+//        if(an_image == nullptr) abort();
+//
+//        int binsSize = 1;
+//
+//        if(num_gray_levels > 0){
+//            binsSize =num_gray_levels+1;
+//        }
+//
+//
+//        int bins[binsSize] ={0};
+//        int min =binsSize;
+//        int max = -1;
+//
+//        for (int i = 0; i < num_rows; ++i) {
+//            for (int j = 0;j < num_columns; ++j) {
+//                int pixelVal = an_image->GetPixel(i,j);
+//                cout<<pixelVal<<" ";
+//
+//                 if(pixelVal<min) {
+//                     min = pixelVal;
+//                 }
+//                 if(pixelVal>max) {
+//                     max = pixelVal;
+//                 }
+//
+//                bins[pixelVal]++;
+//
+//            }
+//            cout<<endl;
+//        }
+//
+//        cout<<"Bins : "<<endl;
+//
+//        for(int i=0;i<binsSize;i++){
+//            cout<<i<<" - "<<bins[i]<<endl;
+//        }
+//
+//
+//        cout<<"Min : "<<min<<endl;
+//        cout<<"Max : "<<max<<endl;
+//
+//    }
 
 
 
@@ -199,26 +202,113 @@ namespace ComputerVisionProjects {
         an_image->SetNumberGrayLevels(1);
     }
 
-//sequential labeling 
+    //sequential labeling equivalence case method
+    void saveEquivalence(std::vector<std::set<int>>& equivalenceMap, int label1, int label2){
+        if(label1==label2) {
+            return;
+        }
+
+        int found = -1;
+
+        vector<int> groups2Merge;
+
+        for(int i =0;i<equivalenceMap.size();i++) {
+            set<int> groupSet = equivalenceMap.at(i);
+            if(groupSet.find(label1)!=groupSet.end()){
+                groupSet.insert(label2);
+                equivalenceMap.at(i) = groupSet;
+                if(found==-1) {
+                    found = i;
+                }else{
+                    groups2Merge.push_back(i);
+                }
+            } else if(groupSet.find(label2)!=groupSet.end()) {
+                groupSet.insert(label1);
+                equivalenceMap.at(i) = groupSet;
+                if(found==-1) {
+                    found = i;
+                }else{
+                    groups2Merge.push_back(i);
+                }
+            }
+        }
+
+        if(found==-1){
+            set<int> newSet;
+            newSet.insert(label1);
+            newSet.insert(label2);
+            equivalenceMap.push_back(newSet);
+        } else {
+            if(!groups2Merge.empty()){
+                set<int> foundSet = equivalenceMap.at(found);
+                for(int k=groups2Merge.size()-1;k>-1;k--){
+                    int indexOfGroup2merge = groups2Merge.at(k);
+                    set<int> set2merge = equivalenceMap.at(indexOfGroup2merge);
+                    foundSet.insert(set2merge.begin(),set2merge.end());
+                    equivalenceMap.erase(equivalenceMap.begin()+indexOfGroup2merge);
+                }
+                equivalenceMap.at(found) = foundSet;
+            }
+        }
+
+    }
+
+    int getEquivClass(std::vector<std::set<int>> equivalenceMap, int label){
+        for(int i =0;i<equivalenceMap.size();i++) {
+            set<int> groupSet = equivalenceMap.at(i);
+            if(groupSet.find(label)!=groupSet.end()){
+                return i+1;
+            }
+        }
+    }
+
+//    void printEquivClassInfo(std::vector<std::set<int>> equivalenceMap){
+//        int max = equivalenceMap.at(0).size();
+//        int min = max;
+//
+//        for(int i=0;i<equivalenceMap.size();i++){
+//            set<int> groupSet = equivalenceMap.at(i);
+//            if(groupSet.size()>max) max = groupSet.size();
+//            if(groupSet.size()<min) min = groupSet.size();
+//        }
+//
+//        cout<<"Max members : "<<max<<endl;
+//        cout<<"Min members : "<<min<<endl;
+//
+//    }
+
     void p2(Image *an_image){
 
         const int num_rows = an_image->num_rows();
         const int num_columns = an_image->num_columns();
 
+        std::vector<std::set<int>> equivalenceMap;
+
         if(an_image == nullptr) abort();
-        int k =1,m=255;
+        int k =1;
         for (int i = 0; i < num_rows; ++i) {
             for (int j = 0;j < num_columns; ++j) {
+                int pixelVal = an_image->GetPixel(i,j);
 
-                if(1 == an_image->GetPixel(i,j)) {
-                    if(1 <= an_image->GetPixel(i-1,j)&& 0== an_image->GetPixel(i,j-1)){
-                        an_image->SetPixel(i,j,an_image->GetPixel(i-1,j));
+                int upPixelVal = 0;
+                if(i>0){
+                    upPixelVal = an_image->GetPixel(i-1,j);
+                }
+
+                int leftPixelVal = 0;
+                if(j>0){
+                    leftPixelVal = an_image->GetPixel(i,j-1);
+                }
+
+                if(pixelVal == 1) {
+                    if(upPixelVal >= 1 && leftPixelVal==0){
+                        an_image->SetPixel(i,j,upPixelVal);
                     }
-                    else if(0 == an_image->GetPixel(i-1,j)&& 1<= an_image->GetPixel(i,j-1)){
-                        an_image->SetPixel(i,j,an_image->GetPixel(i,j-1));
-                    } else if (1 <= an_image->GetPixel(i-1,j) && 1<= an_image->GetPixel(i,j-1)){
-                        // record equivalence
-                        an_image->SetPixel(i,j,an_image->GetPixel(i,j-1));
+                    else if(upPixelVal == 0&& leftPixelVal >=1 ){
+                        an_image->SetPixel(i,j,leftPixelVal);
+                    } else if (upPixelVal >= 1 && leftPixelVal >=1 ){
+                        saveEquivalence(equivalenceMap,leftPixelVal,upPixelVal);
+                        an_image->SetPixel(i,j,leftPixelVal);
                     } else {
                         an_image->SetPixel(i,j,k);
                         k++;
@@ -226,9 +316,29 @@ namespace ComputerVisionProjects {
                 }
             }
         }
-        an_image->SetNumberGrayLevels(k);
+
+
+        for (int i = 0; i < num_rows; ++i) {
+            for (int j = 0;j < num_columns; ++j) {
+                int pixelVal = an_image->GetPixel(i,j);
+
+                if(pixelVal >= 1) {
+                    an_image->SetPixel(i,j,getEquivClass(equivalenceMap,pixelVal));
+                }
+            }
+        }
+
+        //printEquivClassInfo(equivalenceMap);
+
+        an_image->SetNumberGrayLevels(equivalenceMap.size());
     }
 
+    void p3(Image *an_image){
+        std::vector<std::set<int>> equivalenceMap;
+        int label;
+        int numberofObjects = getEquivClass(equivalenceMap,label);
+        cout<<numberofObjects;
+    }
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes
 // "Computer Graphics. Principles and practice", 

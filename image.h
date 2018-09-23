@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 #include <string>
+#include <set>
+#include <vector>
 
 namespace ComputerVisionProjects {
  
@@ -80,13 +82,15 @@ void DrawLine(int x0, int y0, int x1, int y1, int color,
 	      Image *an_image);
 
 
-void printImageInfo(Image *an_image);
+//void printImageInfo(Image *an_image);
 
 //converts a gray-level image to a binary image
 // given a threshold value
 void p1(Image *an_image,int T);
 
 void p2(Image *an_image);
+
+void p3(Image *an_image);
 
 
 } // namespace ComputerVisionProjects

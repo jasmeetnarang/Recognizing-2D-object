@@ -30,6 +30,7 @@ main(int argc, char **argv){
     //DrawLine(0, 0, 100, 240, 200,
 //	   &an_image);
     p2(&an_image);
+    p3(&an_image);
     //printImageInfo(&an_image);
 
     if (!WriteImage(output_file, an_image)){
