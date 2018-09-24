@@ -11,6 +11,9 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <cmath>
+#include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -333,22 +336,27 @@ namespace ComputerVisionProjects {
         an_image->SetNumberGrayLevels(equivalenceMap.size());
     }
 
-    void p3(Image *an_image){
+    void p3(Image *an_image, string database_file){
         const int num_rows = an_image->num_rows();
         const int num_columns = an_image->num_columns();
+        ofstream out;
 
+        float positionX =0.0, positionY =0.0, E=0.0,orientation =0.0;
+        out.open(database_file);
         int numberofObjects = 0;
+        int lasti,lastj;
         numberofObjects = an_image->num_gray_levels();
-        //cout<<numberofObjects;
+
         for(int k=1;k<=numberofObjects;k++){
             float Area = 0.0;
             float iVal = 0.0, jVal = 0.0;
             int momenta =0,momentb=0, momentc =0;
-            //cout<<"label:"<<k<<" ";
+            out<<k;
+
             for (int i = 0; i < num_rows; ++i) {
                 for (int j = 0;j < num_columns; ++j) {
                     int pixelVal = an_image->GetPixel(i, j);
-                    //if(pixelVal == 1) cout<<pixelVal;
+
                     if(pixelVal == k) {
                         Area = pixelVal + Area;
                         iVal = iVal+(i*pixelVal);
@@ -356,21 +364,38 @@ namespace ComputerVisionProjects {
                         momenta = momenta +(i*i*pixelVal);
                         momentb = momentb +(i*j*pixelVal);
                         momentc = momentc + (j*j*pixelVal);
-
+                        lasti = i;
+                        lastj = j;
                     }
 
                 }
             }
-            cout<<"Area:"<<Area<<" ";
+
+            string space = " ";
+            string eol = "\n";
+
+            out<<space<<Area<<space;
+
             float fract = 1/Area;
-            cout<<"fract:"<<fract<<" ";
-            cout<<"position of x:"<<fract*iVal<<" ";
-            cout<<"position of y:"<<fract*jVal<<" ";
-            cout<<"second moment a:"<< momenta<<" ";
-            cout<<"second moment b:"<< momentb<<" ";
-            cout<<"second moment c:"<< momentc<<" "<<endl;
-            //return Area;
+
+            positionX = fract*iVal;
+            positionY = fract*jVal;
+            orientation = atan(momentb/(momentc-momenta));
+            float parta = momenta*(pow(sin(orientation),2));
+            float partb = momentb*sin(orientation)*cos(orientation);
+            float partc = momentc*pow(cos(orientation),2);
+            E = parta-partb+partc;
+
+
+            out<<positionX<<space<<positionY<<space;
+            //fixed<<setprecision(2)
+            out<<E<<space;
+            out<<orientation<<eol;
+            DrawLine(positionX,positionY,lasti,lastj,200,
+                     an_image);
         }
+        out.close();
+
     }
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes

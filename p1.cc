@@ -29,8 +29,8 @@ main(int argc, char **argv){
   // 200.
   //DrawLine(0, 0, 100, 240, 200,
 //	   &an_image); 
-  p1(&an_image,180);
-  printImageInfo(&an_image);
+  p1(&an_image,128);
+//  printImageInfo(&an_image);
 
   
   if (!WriteImage(output_file, an_image)){
