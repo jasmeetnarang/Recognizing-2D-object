@@ -397,6 +397,42 @@ namespace ComputerVisionProjects {
         out.close();
 
     }
+
+    void p4(Image *an_image, string input_file){
+        const int num_rows = an_image->num_rows();
+        const int num_columns = an_image->num_columns();
+        string file;
+        ifstream in;
+
+        string label, rowcenter, colcenter, E,orientation,space;
+
+        in.open(input_file);
+        if(in.is_open()){
+            while(!in.eof()){
+                in>>label;
+                in>>space;
+                in>>rowcenter;
+                in>>space;
+                in>>colcenter;
+                in>>space;
+                in>>E;
+                in>>space;
+                in>>orientation;
+                in>>space;
+
+                cout<<label<<" "<<rowcenter<<" "<<colcenter<<" "<<E<<" "<<orientation;
+            }
+        }
+
+
+
+
+
+
+
+    }
+
+
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes
 // "Computer Graphics. Principles and practice", 
