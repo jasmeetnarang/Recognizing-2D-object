@@ -468,6 +468,11 @@ namespace ComputerVisionProjects {
         }
 
         vector<record> records = getObjParams(an_image);
+        vector<float> Evalues;
+        int prevlabel=0,label =0;
+        float MinValue = MAXFLOAT;
+        float ImageE = 0.0, ImageRowCenter = 0.0, ImageColCenter =0.0, ImageOrienattion =0.0;
+        int Imagelasti =0.0,Imagelastj =0.0;
 
         for(int i =0;i<prevRecords.size();i++){
             for (int j = 0; j < records.size(); j++) {
@@ -477,13 +482,39 @@ namespace ComputerVisionProjects {
                 float differenceOfcolumn = abs(prevRecord.colY - record.colY);
                 float differenceOfE = abs(prevRecord.E - record.E);
                 float differenceofOrientation = abs(prevRecord.orientation - record.orientation);
-                cout<<"For label "<<prevRecord.label<<" "<<record.label<<endl;
-                cout<<"Diff of X "<<differenceOfRow<<"\n"<<"Diff of Y "<<differenceOfcolumn<<"\n";
-                cout<<"Diff of Inertia "<<differenceOfE<<"\n"<<"Diff of Orientation "<<differenceofOrientation<<endl<<endl;
+
+
+                if(differenceOfE < MinValue){
+                    MinValue = differenceOfE;
+
+                    ImageE = record.E;
+                    label = record.label;
+                    prevlabel = prevRecord.label;
+                    ImageColCenter = record.colY;
+                    ImageRowCenter =record.rowX;
+                    ImageOrienattion = record.orientation;
+                    Imagelasti = record.lasti;
+                    Imagelastj = record.lastj;
+                }
+
+
+                //Evalues.push_back(differenceOfE);
+
+
+//                cout<<"For label "<<prevRecord.label<<" "<<record.label<<endl;
+//                cout<<"Diff of X "<<differenceOfRow<<"\n"<<"Diff of Y "<<differenceOfcolumn<<"\n";
+//                cout<<"Diff of Inertia "<<differenceOfE<<"\n"<<"Diff of Orientation "<<differenceofOrientation<<endl<<endl;
 
             }
         }
+//        float min = Evalues.at(0);
+//        for(int j =0;j<Evalues.size();j++){
+//            if(Evalues.at(j) < min)
+//                min = Evalues.at(j);
+//        }
 
+        DrawLine(ImageRowCenter,ImageColCenter,Imagelasti,Imagelastj,200,an_image);
+        //cout<<"Min: "<<MinValue<<endl<<"Prevlabel: "<<prevlabel<<"Label: "<<label;
     }
 //    void extracting_line(std::string input_file){
 //        ifstream in;
