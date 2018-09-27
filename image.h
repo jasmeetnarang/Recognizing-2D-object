@@ -94,7 +94,9 @@ void p3(Image *an_image, std::string database_file);
 
 void p4(Image *an_image, std::string input_file);
 
-//void (const string text_line);
+void extracting_line(std::string input_file);
+
+void extract_text(std::string text_line);
 
 } // namespace ComputerVisionProjects
 

@@ -206,7 +206,7 @@ namespace ComputerVisionProjects {
     }
 
     //sequential labeling equivalence case method
-    void saveEquivalence(std::vector<std::set<int>>& equivalenceMap, int label1, int label2){
+    void saveEquivalence(vector<set<int>>& equivalenceMap, int label1, int label2){
         if(label1==label2) {
             return;
         }
@@ -285,7 +285,7 @@ namespace ComputerVisionProjects {
         const int num_rows = an_image->num_rows();
         const int num_columns = an_image->num_columns();
 
-        std::vector<std::set<int>> equivalenceMap;
+        vector<set<int>> equivalenceMap;
 
         if(an_image == nullptr) abort();
         int k =1;
@@ -361,9 +361,9 @@ namespace ComputerVisionProjects {
                         Area = pixelVal + Area;
                         iVal = iVal+(i*pixelVal);
                         jVal = jVal+(j*pixelVal);
-                        momenta = momenta +(i*i*pixelVal);
-                        momentb = momentb +(i*j*pixelVal);
-                        momentc = momentc + (j*j*pixelVal);
+                        momenta = momenta +(i*i*1);
+                        momentb = momentb +(i*j*1);
+                        momentc = momentc + (j*j*1);
                         lasti = i;
                         lastj = j;
                     }
@@ -374,20 +374,29 @@ namespace ComputerVisionProjects {
             string space = " ";
             string eol = "\n";
 
-            out<<space<<Area<<space;
+            //out<<space<<Area;
 
             float fract = 1/Area;
 
             positionX = fract*iVal;
             positionY = fract*jVal;
-            orientation = atan(momentb/(momentc-momenta));
-            float parta = momenta*(pow(sin(orientation),2));
-            float partb = momentb*sin(orientation)*cos(orientation);
-            float partc = momentc*pow(cos(orientation),2);
+
+            momentb = 2*momentb;
+
+            orientation = (atan((float)momentb / ((float)momenta - (float)momentc)) / 2);
+
+            float sin_theta = sin(orientation);
+            float cos_theta = cos(orientation);
+
+            float parta = (float)momenta*sin_theta*sin_theta;
+            float partb = (float)momentb*sin_theta*cos_theta;
+            float partc = (float)momentc*cos_theta*cos_theta;
+
             E = parta-partb+partc;
 
 
-            out<<positionX<<space<<positionY<<space;
+            out<<space<<positionX<<space<<positionY<<space;
+
             //fixed<<setprecision(2)
             out<<E<<space;
             out<<orientation<<eol;
@@ -402,37 +411,65 @@ namespace ComputerVisionProjects {
         const int num_rows = an_image->num_rows();
         const int num_columns = an_image->num_columns();
         string file;
-        ifstream in;
+        //ifstream in;
 
-        string label, rowcenter, colcenter, E,orientation,space;
+        string label1, rowcenter1, colcenter1, E1,orientation1,space;
+
+        extracting_line(input_file);
+        cout<<"here: ";
+//        in.open(input_file);
+//        if(in.is_open()){
+//            while(!in.eof()){
+//                in>>label1;
+//                in>>space;
+//                in>>rowcenter1;
+//                in>>space;
+//                in>>colcenter1;
+//                in>>space;
+//                in>>E1;
+//                in>>space;
+//                in>>orientation1;
+//                in>>space;
+
+
+
+                //cout<<"here: "<<label1<<" "<<rowcenter1<<" "<<colcenter1<<" "<<E1<<" "<<orientation1<<endl;
+            }
+
+         //   in.close();
+        //}
+
+    void extracting_line(std::string input_file){
+        ifstream in;
+        string text_line;
 
         in.open(input_file);
         if(in.is_open()){
             while(!in.eof()){
-                in>>label;
-                in>>space;
-                in>>rowcenter;
-                in>>space;
-                in>>colcenter;
-                in>>space;
-                in>>E;
-                in>>space;
-                in>>orientation;
-                in>>space;
-
-                cout<<label<<" "<<rowcenter<<" "<<colcenter<<" "<<E<<" "<<orientation;
+                getline(in,text_line);
+                extract_text(text_line);
             }
         }
 
+    }
+
+    void extract_text(std::string text_line){
+       int length = text_line.length();
+       const char space = ' ';
+
+       char label = text_line[0];
+       cout<<label<<endl;
 
 
 
 
+//       for(int i =0;i<length;i++){
+//           if(text_line[i] == ' ')
+//               space = text_line[i];
+//       }
 
 
     }
-
-
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes
 // "Computer Graphics. Principles and practice", 
