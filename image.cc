@@ -15,6 +15,16 @@
 #include <fstream>
 #include <iomanip>
 
+struct record {
+    int label;
+    float rowX;
+    float colY;
+    float E;
+    float orientation;
+    int lasti;
+    int lastj;
+};
+
 using namespace std;
 
 namespace ComputerVisionProjects {
@@ -336,6 +346,75 @@ namespace ComputerVisionProjects {
         an_image->SetNumberGrayLevels(equivalenceMap.size());
     }
 
+
+    vector<record> getObjParams(Image *an_image) {
+        const int num_rows = an_image->num_rows();
+        const int num_columns = an_image->num_columns();
+
+        float positionX =0.0, positionY =0.0, E=0.0,orientation =0.0;
+        int numberofObjects = 0;
+        numberofObjects = an_image->num_gray_levels();
+
+        vector<record> records;
+
+        for(int k=1;k<=numberofObjects;k++) {
+            float Area = 0.0;
+            float iVal = 0.0, jVal = 0.0;
+            int momenta = 0, momentb = 0, momentc = 0;
+
+            int lasti=0,lastj=0;
+
+            for (int i = 0; i < num_rows; ++i) {
+                for (int j = 0; j < num_columns; ++j) {
+                    int pixelVal = an_image->GetPixel(i, j);
+
+                    if (pixelVal == k) {
+                        Area = pixelVal + Area;
+                        iVal = iVal + (i * pixelVal);
+                        jVal = jVal + (j * pixelVal);
+                        momenta = momenta + (i * i * 1);
+                        momentb = momentb + (i * j * 1);
+                        momentc = momentc + (j * j * 1);
+                        lasti = i;
+                        lastj = j;
+                    }
+
+                }
+            }
+
+            float fract = 1 / Area;
+
+            positionX = fract * iVal;
+            positionY = fract * jVal;
+
+            momentb = 2 * momentb;
+
+            orientation = (atan((float) momentb / ((float) momenta - (float) momentc)) / 2);
+
+            float sin_theta = sin(orientation);
+            float cos_theta = cos(orientation);
+
+            float parta = (float) momenta * sin_theta * sin_theta;
+            float partb = (float) momentb * sin_theta * cos_theta;
+            float partc = (float) momentc * cos_theta * cos_theta;
+
+            E = parta - partb + partc;
+
+            record record1{};
+
+            record1.label = k;
+            record1.rowX = positionX;
+            record1.colY = positionY;
+            record1.E = E;
+            record1.orientation = orientation;
+            record1.lasti = lasti;
+            record1.lastj = lastj;
+            records.push_back(record1);
+        };
+
+        return records;
+    }
+
     void p3(Image *an_image, string database_file){
         const int num_rows = an_image->num_rows();
         const int num_columns = an_image->num_columns();
@@ -347,129 +426,95 @@ namespace ComputerVisionProjects {
         int lasti,lastj;
         numberofObjects = an_image->num_gray_levels();
 
-        for(int k=1;k<=numberofObjects;k++){
-            float Area = 0.0;
-            float iVal = 0.0, jVal = 0.0;
-            int momenta =0,momentb=0, momentc =0;
-            out<<k;
+        vector<record> records = getObjParams(an_image);
 
-            for (int i = 0; i < num_rows; ++i) {
-                for (int j = 0;j < num_columns; ++j) {
-                    int pixelVal = an_image->GetPixel(i, j);
-
-                    if(pixelVal == k) {
-                        Area = pixelVal + Area;
-                        iVal = iVal+(i*pixelVal);
-                        jVal = jVal+(j*pixelVal);
-                        momenta = momenta +(i*i*1);
-                        momentb = momentb +(i*j*1);
-                        momentc = momentc + (j*j*1);
-                        lasti = i;
-                        lastj = j;
-                    }
-
-                }
-            }
+        for(int i=0;i<records.size();i++) {
+            record record1 = records.at(i);
 
             string space = " ";
-            string eol = "\n";
 
-            //out<<space<<Area;
-
-            float fract = 1/Area;
-
-            positionX = fract*iVal;
-            positionY = fract*jVal;
-
-            momentb = 2*momentb;
-
-            orientation = (atan((float)momentb / ((float)momenta - (float)momentc)) / 2);
-
-            float sin_theta = sin(orientation);
-            float cos_theta = cos(orientation);
-
-            float parta = (float)momenta*sin_theta*sin_theta;
-            float partb = (float)momentb*sin_theta*cos_theta;
-            float partc = (float)momentc*cos_theta*cos_theta;
-
-            E = parta-partb+partc;
-
-
-            out<<space<<positionX<<space<<positionY<<space;
-
-            //fixed<<setprecision(2)
-            out<<E<<space;
-            out<<orientation<<eol;
-            DrawLine(positionX,positionY,lasti,lastj,200,
+            out<<record1.label<<space<<record1.rowX<<space<<record1.colY<<space<<record1.E<<space<<record1.orientation<<endl;
+            DrawLine(record1.rowX,record1.colY,record1.lasti,record1.lastj,200,
                      an_image);
         }
         out.close();
 
     }
 
-    void p4(Image *an_image, string input_file){
-        const int num_rows = an_image->num_rows();
-        const int num_columns = an_image->num_columns();
-        string file;
-        //ifstream in;
-
-        string label1, rowcenter1, colcenter1, E1,orientation1,space;
-
-        extracting_line(input_file);
-        cout<<"here: ";
-//        in.open(input_file);
-//        if(in.is_open()){
-//            while(!in.eof()){
-//                in>>label1;
-//                in>>space;
-//                in>>rowcenter1;
-//                in>>space;
-//                in>>colcenter1;
-//                in>>space;
-//                in>>E1;
-//                in>>space;
-//                in>>orientation1;
-//                in>>space;
-
-
-
-                //cout<<"here: "<<label1<<" "<<rowcenter1<<" "<<colcenter1<<" "<<E1<<" "<<orientation1<<endl;
-            }
-
-         //   in.close();
-        //}
-
-    void extracting_line(std::string input_file){
+    void p4(Image *an_image, string input_file) {
         ifstream in;
-        string text_line;
+
+        vector<record> prevRecords;
 
         in.open(input_file);
-        if(in.is_open()){
-            while(!in.eof()){
-                getline(in,text_line);
-                extract_text(text_line);
+        if (in.is_open()) {
+            while (!in.eof()) {
+
+                record record1{};
+                in >> record1.label;
+
+                if(in.eof()){
+                    break;
+                }
+
+                in >> record1.rowX;
+                in >> record1.colY;
+                in >> record1.E;
+                in >> record1.orientation;
+                prevRecords.push_back(record1);
+            }
+
+            in.close();
+        }
+
+        vector<record> records = getObjParams(an_image);
+
+        for(int i =0;i<prevRecords.size();i++){
+            for (int j = 0; j < records.size(); j++) {
+                record prevRecord = prevRecords.at(i);
+                record record = records.at(j);
+                float differenceOfRow = abs(prevRecord.rowX - record.rowX);
+                float differenceOfcolumn = abs(prevRecord.colY - record.colY);
+                float differenceOfE = abs(prevRecord.E - record.E);
+                float differenceofOrientation = abs(prevRecord.orientation - record.orientation);
+                cout<<"For label "<<prevRecord.label<<" "<<record.label<<endl;
+                cout<<"Diff of X "<<differenceOfRow<<"\n"<<"Diff of Y "<<differenceOfcolumn<<"\n";
+                cout<<"Diff of Inertia "<<differenceOfE<<"\n"<<"Diff of Orientation "<<differenceofOrientation<<endl<<endl;
+
             }
         }
 
     }
+//    void extracting_line(std::string input_file){
+//        ifstream in;
+//        string text_line;
+//
+//        in.open(input_file);
+//        if(in.is_open()){
+//            while(!in.eof()){
+//                getline(in,text_line);
+//                extract_text(text_line);
+//            }
+//        }
+//
+//    }
+//
+//    void extract_text(std::string text_line){
+//       int length = text_line.length();
+//       const char space = ' ';
+//
+//       char label = text_line[0];
+//       cout<<label<<endl;
+//
+//
+//
+//
+////       for(int i =0;i<length;i++){
+////           if(text_line[i] == ' ')
+////               space = text_line[i];
+////       }
+//
 
-    void extract_text(std::string text_line){
-       int length = text_line.length();
-       const char space = ' ';
-
-       char label = text_line[0];
-       cout<<label<<endl;
-
-
-
-
-//       for(int i =0;i<length;i++){
-//           if(text_line[i] == ' ')
-//               space = text_line[i];
-//       }
-
-
-    }
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes
 // "Computer Graphics. Principles and practice", 
