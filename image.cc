@@ -142,59 +142,6 @@ namespace ComputerVisionProjects {
         return true;
     }
 
-//Coverts the gray scale image to a binay image
-//given a threshold value
-
-//    void printImageInfo(Image *an_image){
-//        const int num_rows = an_image->num_rows();
-//        const int num_columns = an_image->num_columns();
-//        const int num_gray_levels =an_image->num_gray_levels();
-//
-//        if(an_image == nullptr) abort();
-//
-//        int binsSize = 1;
-//
-//        if(num_gray_levels > 0){
-//            binsSize =num_gray_levels+1;
-//        }
-//
-//
-//        int bins[binsSize] ={0};
-//        int min =binsSize;
-//        int max = -1;
-//
-//        for (int i = 0; i < num_rows; ++i) {
-//            for (int j = 0;j < num_columns; ++j) {
-//                int pixelVal = an_image->GetPixel(i,j);
-//                cout<<pixelVal<<" ";
-//
-//                 if(pixelVal<min) {
-//                     min = pixelVal;
-//                 }
-//                 if(pixelVal>max) {
-//                     max = pixelVal;
-//                 }
-//
-//                bins[pixelVal]++;
-//
-//            }
-//            cout<<endl;
-//        }
-//
-//        cout<<"Bins : "<<endl;
-//
-//        for(int i=0;i<binsSize;i++){
-//            cout<<i<<" - "<<bins[i]<<endl;
-//        }
-//
-//
-//        cout<<"Min : "<<min<<endl;
-//        cout<<"Max : "<<max<<endl;
-//
-//    }
-
-
-
 
     void p1(Image *an_image, int T){
         // int num_columns,num_rows;
@@ -274,21 +221,6 @@ namespace ComputerVisionProjects {
             }
         }
     }
-
-//    void printEquivClassInfo(std::vector<std::set<int>> equivalenceMap){
-//        int max = equivalenceMap.at(0).size();
-//        int min = max;
-//
-//        for(int i=0;i<equivalenceMap.size();i++){
-//            set<int> groupSet = equivalenceMap.at(i);
-//            if(groupSet.size()>max) max = groupSet.size();
-//            if(groupSet.size()<min) min = groupSet.size();
-//        }
-//
-//        cout<<"Max members : "<<max<<endl;
-//        cout<<"Min members : "<<min<<endl;
-//
-//    }
 
     void p2(Image *an_image){
 
@@ -497,54 +429,13 @@ namespace ComputerVisionProjects {
                     Imagelastj = record.lastj;
                 }
 
-
-                //Evalues.push_back(differenceOfE);
-
-
-//                cout<<"For label "<<prevRecord.label<<" "<<record.label<<endl;
-//                cout<<"Diff of X "<<differenceOfRow<<"\n"<<"Diff of Y "<<differenceOfcolumn<<"\n";
-//                cout<<"Diff of Inertia "<<differenceOfE<<"\n"<<"Diff of Orientation "<<differenceofOrientation<<endl<<endl;
-
             }
         }
-//        float min = Evalues.at(0);
-//        for(int j =0;j<Evalues.size();j++){
-//            if(Evalues.at(j) < min)
-//                min = Evalues.at(j);
-//        }
 
         DrawLine(ImageRowCenter,ImageColCenter,Imagelasti,Imagelastj,200,an_image);
         //cout<<"Min: "<<MinValue<<endl<<"Prevlabel: "<<prevlabel<<"Label: "<<label;
     }
-//    void extracting_line(std::string input_file){
-//        ifstream in;
-//        string text_line;
-//
-//        in.open(input_file);
-//        if(in.is_open()){
-//            while(!in.eof()){
-//                getline(in,text_line);
-//                extract_text(text_line);
-//            }
-//        }
-//
-//    }
-//
-//    void extract_text(std::string text_line){
-//       int length = text_line.length();
-//       const char space = ' ';
-//
-//       char label = text_line[0];
-//       cout<<label<<endl;
-//
-//
-//
-//
-////       for(int i =0;i<length;i++){
-////           if(text_line[i] == ' ')
-////               space = text_line[i];
-////       }
-//
+
 
 // Implements the Bresenham's incremental midpoint algorithm;
 // (adapted from J.D.Foley, A. van Dam, S.K.Feiner, J.F.Hughes
